@@ -1,0 +1,40 @@
+.App {
+  text-align: center;
+}
+
+.White{
+  background-color: White;
+}
+
+.Black{
+  background-color: Black;
+}
+
+.Red{
+  background-color: Red;
+}
+
+.Square{
+  height: 100px;
+  width: 100px;
+}
+
+.Board{
+  height: 800px;
+  width: 800px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  border: 1px black solid;
+}
+
+.Highlighted{
+  background-color: green;
+}
+
+.Piece{
+  height: 90px;
+  width: 90px;
+  margin: 5px;
+  border-radius: 200px;
+}
