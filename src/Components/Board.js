@@ -62,6 +62,8 @@ class Board extends Component {
       squares: squares
     });
   }
+
+
 //----------------------------------------------------------------
 
   handleSquareSelected(r,c,player,index){
@@ -100,18 +102,37 @@ class Board extends Component {
     }
   }
 
+
+
   //Find all possible moves for selected piece
+  //------------------------------------------------------------------------------------
   findPossibleMoves(r,c,player){
     let moves = [];
     let squares = this.state.squares;
 
     if(player === "Red"){
       if((r+1) <= 7){
-        if(((c-1) >= 0) && (!squares[this.indexForSquare(r+1,c-1)].hasPiece)){
-          moves.push(this.indexForSquare(r+1,c-1));
+        if((c-1) >= 0){
+          let square = squares[this.indexForSquare(r+1,c-1)];
+          if(!square.hasPiece){
+            moves.push(square.index);
+          }else if(square.hasPiece === 'White'){
+            if(((r+2) <= 7) && ((c-2) >= 0))
+              if(!squares[this.indexForSquare(r+2,c-2)].hasPiece){
+                moves.push(this.indexForSquare(r+2,c-2));
+            }
+          }
         }
-        if(((c+1) <= 7) && (!squares[this.indexForSquare(r+1,c+1)].hasPiece)){
-          moves.push(this.indexForSquare(r+1,c+1));
+        if((c+1) <= 7){
+          let square = squares[this.indexForSquare(r+1,c+1)];
+          if(!square.hasPiece){
+            moves.push(square.index);
+          }else if(square.hasPiece === 'White'){
+            if(((r+2) <= 7) && ((c+2) <= 7))
+              if(!squares[this.indexForSquare(r+2,c+2)].hasPiece){
+                moves.push(this.indexForSquare(r+2,c+2));
+            }
+          }
         }
       }
       return moves;
@@ -119,21 +140,43 @@ class Board extends Component {
 
     if(player === "White"){
       if((r-1) >= 0){
-        if(((c-1) >= 0) && (!squares[this.indexForSquare(r-1,c-1)].hasPiece)){
-          moves.push(this.indexForSquare(r-1,c-1));
+        if((c-1) >= 0){
+          let square = squares[this.indexForSquare(r-1,c-1)];
+          if(!square.hasPiece){
+            moves.push(square.index);
+          }else if(square.hasPiece === 'Red'){
+            if(((r-2) <= 7) && ((c-2) >= 0))
+              if(!squares[this.indexForSquare(r-2,c-2)].hasPiece){
+                moves.push(this.indexForSquare(r-2,c-2));
+            }
+          }
         }
-        if(((c+1) <= 7) && (!squares[this.indexForSquare(r-1,c+1)].hasPiece)){
-          moves.push(this.indexForSquare(r-1,c+1));
+        if((c+1) <= 7){
+          let square = squares[this.indexForSquare(r-1,c+1)];
+          if(!square.hasPiece){
+            moves.push(square.index);
+          }else if(square.hasPiece === 'Red'){
+            if(((r-2) <= 7) && ((c+2) <= 7))
+              if(!squares[this.indexForSquare(r-2,c+2)].hasPiece){
+                moves.push(this.indexForSquare(r-2,c+2));
+            }
+          }
         }
       }
       return moves;
     }
   }
+  //------------------------------------------------------------------------------------------
 
 
+  findPossibleJump(){
+
+  }
+
+//unhighlight all squares
   unhighlight(){
     let squares = this.state.squares;
-    //unhighlight all squares
+
     for(var i = 0; i < squares.length; i++){
       if(squares[i].highlighted){
         squares[i].highlighted = false;
@@ -144,6 +187,8 @@ class Board extends Component {
     });
   }
 
+
+  //Find index for square at row and col
   indexForSquare(r,c){
     let squares = this.state.squares;
 
@@ -156,9 +201,14 @@ class Board extends Component {
     }
   }
 
+
+
   componentWillMount(){
     this.newGame();
   }
+
+
+
 
   render() {
     let board;
