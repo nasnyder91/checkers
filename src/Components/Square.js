@@ -19,7 +19,7 @@ class Square extends Component {
     }else{
       color = 'Black';
     }
-    const classes = "Square " + color + " " + (this.props.highlighted ? "Highlighted" : false);
+    const classes = "Square " + color + " " + (this.props.highlighted ? "Highlighted" : false) + " " + (this.props.jumpable ? "Jumpable" : false);
     const pieceClasses = "Piece " + (this.props.hasPiece ? this.props.hasPiece : null);
 
 

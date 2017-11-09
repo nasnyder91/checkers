@@ -32,6 +32,10 @@
   background-color: green;
 }
 
+.Jumpable{
+  background-color: yellow;
+}
+
 .Piece{
   height: 90px;
   width: 90px;

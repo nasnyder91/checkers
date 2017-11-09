@@ -31,7 +31,9 @@ class Board extends Component {
     this.state = {
       squares: [],
       selectedPiece: {index: null,
-                      player: null}
+                      player: null},
+      redScore: 0,
+      whiteScore: 0
     }
   }
 
@@ -45,13 +47,14 @@ class Board extends Component {
 
       for(var c = 0; c < row.length; c++){
         let square = {
-          index: squares.length,
-          color: boardLayout[r][c],
-          row: r,
-          col: c,
-          hasPiece: row[c],
-          highlighted: false
-        }
+                        index: squares.length,
+                        color: boardLayout[r][c],
+                        row: r,
+                        col: c,
+                        hasPiece: row[c],
+                        highlighted: false,
+                        jumpable: false
+                      }
         if(!row[c]){
           square.hasPiece = null
         }
@@ -70,16 +73,23 @@ class Board extends Component {
     let squares = this.state.squares;
     if(player){
       let moves;
+      let jumpable;
 
       this.unhighlight();
 
       squares[index].highlighted = !squares[index].highlighted;
 
-      moves = this.findPossibleMoves(r,c,player);
+      moves = this.findPossibleMoves(r,c,player).moves;
+      jumpable = this.findPossibleMoves(r,c,player).jumpable;
 
       if(moves){
         for(var x = 0; x < moves.length; x++){
           squares[moves[x]].highlighted = !squares[moves[x]].highlighted;
+        }
+        if(jumpable){
+          for(var y = 0; y < jumpable.length; y++){
+            squares[jumpable[y]].jumpable = !squares[jumpable[y]].jumpable;
+          }
         }
       }
 
@@ -90,14 +100,31 @@ class Board extends Component {
                         player: player}
       });
     } else if((this.state.selectedPiece.player != null) && (squares[index].highlighted)){
+
+      // HANDLE THE JUMP--------------------------------------------------------------------------------------
       squares[index].hasPiece = this.state.selectedPiece.player;
       squares[this.state.selectedPiece.index].hasPiece = null;
+
+      if(Math.abs(squares[this.state.selectedPiece.index].row - squares[index].row) === 2){
+        let jumped = squares[this.indexForSquare((Math.min(squares[this.state.selectedPiece.index].row,squares[index].row))+1,Math.min(squares[this.state.selectedPiece.index].col,squares[index].col)+1)];
+        if(jumped.hasPiece === "White"){
+          this.setState({
+            redScore: this.state.redScore + 1
+          });
+        }else if(jumped.hasPiece === "Red"){
+          this.setState({
+            whiteScore: this.state.whiteScore + 1
+          });
+        }
+        jumped.hasPiece = null;
+      }
 
       this.setState({
         squares: squares,
         selectedPiece: {index: null,
                         player: null}
       });
+      //------------------------------------------------------------------------------------------------------
       this.unhighlight();
     }
   }
@@ -108,6 +135,7 @@ class Board extends Component {
   //------------------------------------------------------------------------------------
   findPossibleMoves(r,c,player){
     let moves = [];
+    let jumpable = [];
     let squares = this.state.squares;
 
     if(player === "Red"){
@@ -120,6 +148,7 @@ class Board extends Component {
             if(((r+2) <= 7) && ((c-2) >= 0))
               if(!squares[this.indexForSquare(r+2,c-2)].hasPiece){
                 moves.push(this.indexForSquare(r+2,c-2));
+                jumpable.push(square.index);
             }
           }
         }
@@ -131,11 +160,12 @@ class Board extends Component {
             if(((r+2) <= 7) && ((c+2) <= 7))
               if(!squares[this.indexForSquare(r+2,c+2)].hasPiece){
                 moves.push(this.indexForSquare(r+2,c+2));
+                jumpable.push(square.index);
             }
           }
         }
       }
-      return moves;
+      return {moves, jumpable};
     }
 
     if(player === "White"){
@@ -145,9 +175,10 @@ class Board extends Component {
           if(!square.hasPiece){
             moves.push(square.index);
           }else if(square.hasPiece === 'Red'){
-            if(((r-2) <= 7) && ((c-2) >= 0))
+            if(((r-2) >= 0) && ((c-2) >= 0))
               if(!squares[this.indexForSquare(r-2,c-2)].hasPiece){
                 moves.push(this.indexForSquare(r-2,c-2));
+                jumpable.push(square.index);
             }
           }
         }
@@ -156,30 +187,29 @@ class Board extends Component {
           if(!square.hasPiece){
             moves.push(square.index);
           }else if(square.hasPiece === 'Red'){
-            if(((r-2) <= 7) && ((c+2) <= 7))
+            if(((r-2) >= 0) && ((c+2) <= 7))
               if(!squares[this.indexForSquare(r-2,c+2)].hasPiece){
                 moves.push(this.indexForSquare(r-2,c+2));
+                jumpable.push(square.index);
             }
           }
         }
       }
-      return moves;
+      return {moves, jumpable};
     }
   }
+
   //------------------------------------------------------------------------------------------
 
-
-  findPossibleJump(){
-
-  }
 
 //unhighlight all squares
   unhighlight(){
     let squares = this.state.squares;
 
     for(var i = 0; i < squares.length; i++){
-      if(squares[i].highlighted){
+      if(squares[i].highlighted || squares[i].jumpable){
         squares[i].highlighted = false;
+        squares[i].jumpable = false;
       };
     };
     this.setState({
@@ -215,7 +245,7 @@ class Board extends Component {
 
     board = this.state.squares.map(square => {
       return (
-        <Square color={square.color} row={square.row} col={square.col} hasPiece={square.hasPiece} highlighted={square.highlighted} squareSelected={this.handleSquareSelected.bind(this)} index={square.index} key={square.row + "-" + square.col} />
+        <Square color={square.color} row={square.row} col={square.col} hasPiece={square.hasPiece} highlighted={square.highlighted} jumpable={square.jumpable} squareSelected={this.handleSquareSelected.bind(this)} index={square.index} key={square.row + "-" + square.col} />
       );
     });
 
