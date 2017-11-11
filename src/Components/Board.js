@@ -72,61 +72,73 @@ class Board extends Component {
   handleSquareSelected(r,c,player,index){
     let squares = this.state.squares;
     if(player){
-      let moves;
-      let jumpable;
-
-      this.unhighlight();
-
-      squares[index].highlighted = !squares[index].highlighted;
-
-      moves = this.findPossibleMoves(r,c,player).moves;
-      jumpable = this.findPossibleMoves(r,c,player).jumpable;
-
-      if(moves){
-        for(var x = 0; x < moves.length; x++){
-          squares[moves[x]].highlighted = !squares[moves[x]].highlighted;
-        }
-        if(jumpable){
-          for(var y = 0; y < jumpable.length; y++){
-            squares[jumpable[y]].jumpable = !squares[jumpable[y]].jumpable;
-          }
-        }
-      }
-
-
-      this.setState({
-        squares: squares,
-        selectedPiece: {index: index,
-                        player: player}
-      });
+      this.handleMove(r,c,player,index);
     } else if((this.state.selectedPiece.player != null) && (squares[index].highlighted)){
-
-      // HANDLE THE JUMP--------------------------------------------------------------------------------------
-      squares[index].hasPiece = this.state.selectedPiece.player;
-      squares[this.state.selectedPiece.index].hasPiece = null;
-
-      if(Math.abs(squares[this.state.selectedPiece.index].row - squares[index].row) === 2){
-        let jumped = squares[this.indexForSquare((Math.min(squares[this.state.selectedPiece.index].row,squares[index].row))+1,Math.min(squares[this.state.selectedPiece.index].col,squares[index].col)+1)];
-        if(jumped.hasPiece === "White"){
-          this.setState({
-            redScore: this.state.redScore + 1
-          });
-        }else if(jumped.hasPiece === "Red"){
-          this.setState({
-            whiteScore: this.state.whiteScore + 1
-          });
-        }
-        jumped.hasPiece = null;
-      }
-
-      this.setState({
-        squares: squares,
-        selectedPiece: {index: null,
-                        player: null}
-      });
-      //------------------------------------------------------------------------------------------------------
-      this.unhighlight();
+      this.handleJump(index);
     }
+  }
+
+
+
+  handleMove(r,c,player,index){
+    let moves;
+    let jumpable;
+    let squares = this.state.squares;
+
+    this.unhighlight();
+
+    squares[index].highlighted = !squares[index].highlighted;
+
+    moves = this.findPossibleMoves(r,c,player).moves;
+    jumpable = this.findPossibleMoves(r,c,player).jumpable;
+
+    if(moves){
+      for(var x = 0; x < moves.length; x++){
+        squares[moves[x]].highlighted = !squares[moves[x]].highlighted;
+      }
+      if(jumpable){
+        for(var y = 0; y < jumpable.length; y++){
+          squares[jumpable[y]].jumpable = !squares[jumpable[y]].jumpable;
+        }
+      }
+    }
+
+    this.setState({
+      squares: squares,
+      selectedPiece: {index: index,
+                      player: player}
+    });
+  }
+
+
+// HANDLE THE JUMP--------------------------------------------------------------------------------------
+  handleJump(index){
+    let squares = this.state.squares;
+
+    squares[index].hasPiece = this.state.selectedPiece.player;
+    squares[this.state.selectedPiece.index].hasPiece = null;
+
+    if(Math.abs(squares[this.state.selectedPiece.index].row - squares[index].row) === 2){
+      let jumped = squares[this.indexForSquare((Math.min(squares[this.state.selectedPiece.index].row,squares[index].row))+1,Math.min(squares[this.state.selectedPiece.index].col,squares[index].col)+1)];
+      if(jumped.hasPiece === "White"){
+        this.setState({
+          redScore: this.state.redScore + 1
+        });
+      }else if(jumped.hasPiece === "Red"){
+        this.setState({
+          whiteScore: this.state.whiteScore + 1
+        });
+      }
+      jumped.hasPiece = null;
+    }
+
+    this.setState({
+      squares: squares,
+      selectedPiece: {index: null,
+                      player: null}
+    });
+    //------------------------------------------------------------------------------------------------------
+    this.unhighlight();
   }
 
 
