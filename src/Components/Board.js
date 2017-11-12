@@ -33,6 +33,7 @@ class Board extends Component {
       selectedPiece: {index: null,
                       player: null,
                       king: false},
+      jumping: false,
       redScore: 0,
       whiteScore: 0
     }
@@ -83,8 +84,8 @@ class Board extends Component {
 
 
   highlightMoves(r,c,player,index){
-    let moves;
-    let jumpable;
+    let moves = [];
+    let jumpable = [];
     let squares = this.state.squares;
 
     this.unhighlight();
@@ -100,11 +101,14 @@ class Board extends Component {
     }
 
 
-    if(moves){
+    if(moves.length > 0){
       for(var x = 0; x < moves.length; x++){
         squares[moves[x]].highlighted = !squares[moves[x]].highlighted;
       }
-      if(jumpable){
+      if(jumpable.length > 0){
+        this.setState({
+          jumping: true
+        });
         for(var y = 0; y < jumpable.length; y++){
           squares[jumpable[y]].jumpable = !squares[jumpable[y]].jumpable;
         }
@@ -172,6 +176,9 @@ class Board extends Component {
       if(jumpable > 0){
         this.handleSquareSelected(squares[index].row,squares[index].col,squares[index].hasPiece,index);
       }else{
+        this.setState({
+          jumping: false
+        });
       }
     }
   }
@@ -188,7 +195,7 @@ class Board extends Component {
       if((r+1) <= 7){
         if((c-1) >= 0){
           let square = squares[this.indexForSquare(r+1,c-1)];
-          if(!square.hasPiece){
+          if(!square.hasPiece && !this.state.jumping){
             moves.push(square.index);
           }else if(square.hasPiece === 'White'){
             if(((r+2) <= 7) && ((c-2) >= 0))
@@ -200,7 +207,7 @@ class Board extends Component {
         }
         if((c+1) <= 7){
           let square = squares[this.indexForSquare(r+1,c+1)];
-          if(!square.hasPiece){
+          if(!square.hasPiece && !this.state.jumping){
             moves.push(square.index);
           }else if(square.hasPiece === 'White'){
             if(((r+2) <= 7) && ((c+2) <= 7))
@@ -218,7 +225,7 @@ class Board extends Component {
       if((r-1) >= 0){
         if((c-1) >= 0){
           let square = squares[this.indexForSquare(r-1,c-1)];
-          if(!square.hasPiece){
+          if(!square.hasPiece && !this.state.jumping){
             moves.push(square.index);
           }else if(square.hasPiece === 'Red'){
             if(((r-2) >= 0) && ((c-2) >= 0))
@@ -230,7 +237,7 @@ class Board extends Component {
         }
         if((c+1) <= 7){
           let square = squares[this.indexForSquare(r-1,c+1)];
-          if(!square.hasPiece){
+          if(!square.hasPiece && !this.state.jumping){
             moves.push(square.index);
           }else if(square.hasPiece === 'Red'){
             if(((r-2) >= 0) && ((c+2) <= 7))
@@ -261,7 +268,7 @@ class Board extends Component {
     if((r+1) <= 7){
       if((c-1) >= 0){
         let square = squares[this.indexForSquare(r+1,c-1)];
-        if(!square.hasPiece){
+        if(!square.hasPiece && !this.state.jumping){
           moves.push(square.index);
         }else if(square.hasPiece === color){
           if(((r+2) <= 7) && ((c-2) >= 0))
@@ -273,7 +280,7 @@ class Board extends Component {
       }
       if((c+1) <= 7){
         let square = squares[this.indexForSquare(r+1,c+1)];
-        if(!square.hasPiece){
+        if(!square.hasPiece && !this.state.jumping){
           moves.push(square.index);
         }else if(square.hasPiece === color){
           if(((r+2) <= 7) && ((c+2) <= 7))
@@ -287,7 +294,7 @@ class Board extends Component {
     if((r-1) >= 0){
       if((c-1) >= 0){
         let square = squares[this.indexForSquare(r-1,c-1)];
-        if(!square.hasPiece){
+        if(!square.hasPiece && !this.state.jumping){
           moves.push(square.index);
         }else if(square.hasPiece === color){
           if(((r-2) >= 0) && ((c-2) >= 0))
@@ -299,7 +306,7 @@ class Board extends Component {
       }
       if((c+1) <= 7){
         let square = squares[this.indexForSquare(r-1,c+1)];
-        if(!square.hasPiece){
+        if(!square.hasPiece && !this.state.jumping){
           moves.push(square.index);
         }else if(square.hasPiece === color){
           if(((r-2) >= 0) && ((c+2) <= 7))
