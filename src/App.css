@@ -42,3 +42,11 @@
   margin: 5px;
   border-radius: 200px;
 }
+
+.King{
+  height: 70px;
+  background-image: url("./Images/king.png");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: 10px 10px;
+}

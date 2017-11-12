@@ -31,7 +31,8 @@ class Board extends Component {
     this.state = {
       squares: [],
       selectedPiece: {index: null,
-                      player: null},
+                      player: null,
+                      king: false},
       redScore: 0,
       whiteScore: 0
     }
@@ -52,6 +53,7 @@ class Board extends Component {
                         row: r,
                         col: c,
                         hasPiece: row[c],
+                        hasKing: false,
                         highlighted: false,
                         jumpable: false
                       }
@@ -72,15 +74,15 @@ class Board extends Component {
   handleSquareSelected(r,c,player,index){
     let squares = this.state.squares;
     if(player){
-      this.handleMove(r,c,player,index);
+      this.highlightMoves(r,c,player,index);
     } else if((this.state.selectedPiece.player != null) && (squares[index].highlighted)){
-      this.handleJump(index);
+      this.handleMove(r,c,player,index);
     }
   }
 
 
 
-  handleMove(r,c,player,index){
+  highlightMoves(r,c,player,index){
     let moves;
     let jumpable;
     let squares = this.state.squares;
@@ -89,8 +91,14 @@ class Board extends Component {
 
     squares[index].highlighted = !squares[index].highlighted;
 
-    moves = this.findPossibleMoves(r,c,player).moves;
-    jumpable = this.findPossibleMoves(r,c,player).jumpable;
+    if(squares[index].hasKing){
+      moves = this.findPossibleKingMoves(r,c,player).moves;
+      jumpable = this.findPossibleKingMoves(r,c,player).jumpable;
+    }else{
+      moves = this.findPossibleMoves(r,c,player).moves;
+      jumpable = this.findPossibleMoves(r,c,player).jumpable;
+    }
+
 
     if(moves){
       for(var x = 0; x < moves.length; x++){
@@ -106,20 +114,31 @@ class Board extends Component {
     this.setState({
       squares: squares,
       selectedPiece: {index: index,
-                      player: player}
+                      player: player,
+                      king: squares[index].hasKing}
     });
   }
 
 
 // HANDLE THE JUMP--------------------------------------------------------------------------------------
-  handleJump(index){
+  handleMove(r,c,player,index){
     let squares = this.state.squares;
+    let jumped;
 
     squares[index].hasPiece = this.state.selectedPiece.player;
+    squares[index].hasKing = this.state.selectedPiece.king;
     squares[this.state.selectedPiece.index].hasPiece = null;
+    squares[this.state.selectedPiece.index].hasKing = false;
+
+    if((this.state.selectedPiece.player === "White") && (r === 0)){
+      squares[index].hasKing = true;
+    }
+    if((this.state.selectedPiece.player === "Red") && (r === 7)){
+      squares[index].hasKing = true;
+    }
 
     if(Math.abs(squares[this.state.selectedPiece.index].row - squares[index].row) === 2){
-      let jumped = squares[this.indexForSquare((Math.min(squares[this.state.selectedPiece.index].row,squares[index].row))+1,Math.min(squares[this.state.selectedPiece.index].col,squares[index].col)+1)];
+      jumped = squares[this.indexForSquare((Math.min(squares[this.state.selectedPiece.index].row,squares[index].row))+1,Math.min(squares[this.state.selectedPiece.index].col,squares[index].col)+1)];
       if(jumped.hasPiece === "White"){
         this.setState({
           redScore: this.state.redScore + 1
@@ -135,12 +154,27 @@ class Board extends Component {
     this.setState({
       squares: squares,
       selectedPiece: {index: null,
-                      player: null}
+                      player: null,
+                      king: false}
     });
     //------------------------------------------------------------------------------------------------------
     this.unhighlight();
-  }
 
+    //Check for double jump, handle if available
+    if(jumped){
+      let jumpable;
+      if(squares[index].hasKing){
+        jumpable = this.findPossibleKingMoves(squares[index].row,squares[index].col,squares[index].hasPiece).jumpable;
+      } else{
+        jumpable = this.findPossibleMoves(squares[index].row,squares[index].col,squares[index].hasPiece).jumpable;
+      }
+
+      if(jumpable > 0){
+        this.handleSquareSelected(squares[index].row,squares[index].col,squares[index].hasPiece,index);
+      }else{
+      }
+    }
+  }
 
 
   //Find all possible moves for selected piece
@@ -211,6 +245,74 @@ class Board extends Component {
     }
   }
 
+
+  findPossibleKingMoves(r,c,player){
+    let moves = [];
+    let jumpable = [];
+    let squares = this.state.squares;
+    let color;
+    if(player === 'White'){
+      color = "Red";
+    } else{
+      color = "White";
+    }
+
+
+    if((r+1) <= 7){
+      if((c-1) >= 0){
+        let square = squares[this.indexForSquare(r+1,c-1)];
+        if(!square.hasPiece){
+          moves.push(square.index);
+        }else if(square.hasPiece === color){
+          if(((r+2) <= 7) && ((c-2) >= 0))
+            if(!squares[this.indexForSquare(r+2,c-2)].hasPiece){
+              moves.push(this.indexForSquare(r+2,c-2));
+              jumpable.push(square.index);
+          }
+        }
+      }
+      if((c+1) <= 7){
+        let square = squares[this.indexForSquare(r+1,c+1)];
+        if(!square.hasPiece){
+          moves.push(square.index);
+        }else if(square.hasPiece === color){
+          if(((r+2) <= 7) && ((c+2) <= 7))
+            if(!squares[this.indexForSquare(r+2,c+2)].hasPiece){
+              moves.push(this.indexForSquare(r+2,c+2));
+              jumpable.push(square.index);
+          }
+        }
+      }
+    }
+    if((r-1) >= 0){
+      if((c-1) >= 0){
+        let square = squares[this.indexForSquare(r-1,c-1)];
+        if(!square.hasPiece){
+          moves.push(square.index);
+        }else if(square.hasPiece === color){
+          if(((r-2) >= 0) && ((c-2) >= 0))
+            if(!squares[this.indexForSquare(r-2,c-2)].hasPiece){
+              moves.push(this.indexForSquare(r-2,c-2));
+              jumpable.push(square.index);
+          }
+        }
+      }
+      if((c+1) <= 7){
+        let square = squares[this.indexForSquare(r-1,c+1)];
+        if(!square.hasPiece){
+          moves.push(square.index);
+        }else if(square.hasPiece === color){
+          if(((r-2) >= 0) && ((c+2) <= 7))
+            if(!squares[this.indexForSquare(r-2,c+2)].hasPiece){
+              moves.push(this.indexForSquare(r-2,c+2));
+              jumpable.push(square.index);
+          }
+        }
+      }
+    }
+    return {moves, jumpable};
+  }
+
   //------------------------------------------------------------------------------------------
 
 
@@ -257,7 +359,7 @@ class Board extends Component {
 
     board = this.state.squares.map(square => {
       return (
-        <Square color={square.color} row={square.row} col={square.col} hasPiece={square.hasPiece} highlighted={square.highlighted} jumpable={square.jumpable} squareSelected={this.handleSquareSelected.bind(this)} index={square.index} key={square.row + "-" + square.col} />
+        <Square color={square.color} row={square.row} col={square.col} hasPiece={square.hasPiece} hasKing={square.hasKing} highlighted={square.highlighted} jumpable={square.jumpable} squareSelected={this.handleSquareSelected.bind(this)} index={square.index} key={square.row + "-" + square.col} />
       );
     });
 

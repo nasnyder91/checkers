@@ -26,7 +26,11 @@ class Square extends Component {
     return (
       <div className={classes} onClick={this.squareSelected.bind(this,row,col,player,index)}>
         {this.props.hasPiece &&
-          <div className={pieceClasses}></div>
+          <div className={pieceClasses}>
+            {this.props.hasKing &&
+              <div className="King"></div>
+            }
+          </div>
         }
       </div>
     );
