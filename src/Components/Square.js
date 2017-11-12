@@ -3,7 +3,7 @@ import '../App.css';
 
 class Square extends Component {
   squareSelected(r,c,player,index){
-    this.props.squareSelected(r,c,player,index);
+    this.props.squareSelected(r,c,player,index,false);
   }
 
 
