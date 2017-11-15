@@ -40,7 +40,7 @@ class Board extends Component {
   }
 
 
-//Set up pieces in default locations for new game.
+//Set up pieces in default locations for new game.  Reset scores.
 //-----------------------------------------------------------------
   newGame(){
     let squares = [];
@@ -65,7 +65,12 @@ class Board extends Component {
       }
     }
     this.setState({
-      squares: squares
+      squares: squares,
+      selectedPiece: {index: null,
+                      player: null,
+                      king: false},
+      redScore: 0,
+      whiteScore: 0
     });
   }
 
@@ -175,13 +180,18 @@ class Board extends Component {
       if(jumped.hasPiece === "White"){
         this.setState({
           redScore: this.state.redScore + 1
+        }, function(){
+          this.props.scores(this.state.redScore,this.state.whiteScore);
         });
       }else if(jumped.hasPiece === "Red"){
         this.setState({
           whiteScore: this.state.whiteScore + 1
+        }, function(){
+          this.props.scores(this.state.redScore,this.state.whiteScore);
         });
       }
       jumped.hasPiece = null;
+
     }
 
     this.setState({
@@ -429,6 +439,8 @@ class Board extends Component {
     this.setState({
       turn: turn
     });
+
+    this.props.turn(turn);
   }
 
 
@@ -466,13 +478,12 @@ class Board extends Component {
     }
   }
 
-
-
-
-
-
   componentWillMount(){
     this.newGame();
+  }
+
+  componentDidMount(){
+    this.props.onRef(this);
   }
 
   render() {
