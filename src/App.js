@@ -41,10 +41,14 @@ class App extends Component {
     });
   }
 
+  win(player){
+    alert(player + " wins!");
+  }
+
   render() {
     return (
       <div className="App">
-        <Board scores={this.handleScores.bind(this)} turn={this.changeTurn.bind(this)} onRef={ref => {this.child = ref; }} />
+        <Board scores={this.handleScores.bind(this)} turn={this.changeTurn.bind(this)} onRef={ref => {this.child = ref;}} winner={this.win.bind(this)} />
         <ScoreBoard scores={this.state.scores} turn={this.state.turn} newGame={this.newGame} />
       </div>
     );

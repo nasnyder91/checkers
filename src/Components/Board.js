@@ -83,9 +83,19 @@ class Board extends Component {
 
   handleSquareSelected(r,c,player,index,jumping){
     let squares = this.state.squares;
+    let jumpables = this.checkForJumps();
+
     if(player && (player === this.state.turn)){
       if(!jumping){
-        this.highlightMoves(r,c,player,index);
+        if(jumpables.length > 0){
+          if(jumpables.includes(squares[index])){
+            this.highlightMoves(r,c,player,index,true);
+          }else{
+            return;
+          }
+        }else{
+          this.highlightMoves(r,c,player,index,false);
+        }
       }else{
         this.highlightDoubleJumps(r,c,player,index);
       }
@@ -94,12 +104,30 @@ class Board extends Component {
     }
   }
 
+  checkForJumps(){
+    let pieces = [];
+    let squares = this.state.squares;
+
+    for(var i = 0; i < squares.length; i++){
+      if(squares[i].hasPiece === this.state.turn){
+        let jumps = [];
+        if(squares[i].hasKing){
+          jumps = this.findPossibleKingMoves(squares[i].row,squares[i].col,squares[i].hasPiece,false).jumpable;
+        }else{
+          jumps = this.findPossibleMoves(squares[i].row,squares[i].col,squares[i].hasPiece,false).jumpable;
+        }
+        if(jumps.length > 0){
+          pieces.push(squares[i]);
+        }
+      }
+    }
+    return(pieces);
+  }
 
 
 
 
-
-  highlightMoves(r,c,player,index){
+  highlightMoves(r,c,player,index,jumpsOnly){
     let moves = [];
     let jumps = [];
     let jumpable = [];
@@ -110,7 +138,9 @@ class Board extends Component {
     squares[index].highlighted = !squares[index].highlighted;
 
     if(squares[index].hasKing){
-      moves = this.findPossibleKingMoves(r,c,player,false).moves;
+      if(!jumpsOnly){
+        moves = this.findPossibleKingMoves(r,c,player,false).moves;
+      }
       jumps = this.findPossibleKingMoves(r,c,player,false).jumps;
       if(jumps.length > 0){
         for(var i = 0; i < jumps.length; i++){
@@ -119,7 +149,9 @@ class Board extends Component {
       }
       jumpable = this.findPossibleKingMoves(r,c,player,false).jumpable;
     }else{
-      moves = this.findPossibleMoves(r,c,player,false).moves;
+      if(!jumpsOnly){
+        moves = this.findPossibleMoves(r,c,player,false).moves;
+      }
       jumps = this.findPossibleMoves(r,c,player,false).jumps;
       if(jumps.length > 0){
         for(var z = 0; z < jumps.length; z++){
@@ -427,9 +459,11 @@ class Board extends Component {
 
 
 
-
   endTurn(currentTurn){
+    this.checkWin(currentTurn);
+
     let turn;
+
     if(currentTurn === "White"){
       turn = "Red";
     } else{
@@ -444,6 +478,26 @@ class Board extends Component {
   }
 
 
+
+  checkWin(turn){
+    let squares = this.state.squares;
+
+    if(turn === "White"){
+      for(var i = 0; i < squares.length; i++){
+        if(squares[i].hasPiece === "Red"){
+          return;
+        }
+      }
+      this.props.winner(turn);
+    }else if(turn === "Red"){
+      for(var c = 0; c < squares.length; c++){
+        if(squares[c].hasPiece === "White"){
+          return;
+        }
+      }
+      this.props.winner(turn);
+    }
+  }
 
 
 
