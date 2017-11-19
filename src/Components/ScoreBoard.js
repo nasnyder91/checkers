@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import '../App.css';
+import Button from 'react-bootstrap/lib/Button';
 
 class ScoreBoard extends Component {
   render() {
     return (
       <div className="ScoreBoard">
-        <table>
+        <table border="1">
           <thead>
             <tr>
               <th>Player</th>
@@ -23,8 +24,9 @@ class ScoreBoard extends Component {
             </tr>
           </tbody>
         </table>
+        <br/>
         <label>Turn: {this.props.turn}</label> <br/>
-        <button onClick={this.props.newGame}>New Game</button>
+        <Button className="newGameBtn" bsStyle="default" onClick={this.props.newGame}>New Game</Button>
       </div>
     );
   }

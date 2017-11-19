@@ -70,7 +70,8 @@ class Board extends Component {
                       player: null,
                       king: false},
       redScore: 0,
-      whiteScore: 0
+      whiteScore: 0,
+      turn: "White"
     });
   }
 

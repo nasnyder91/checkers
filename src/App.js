@@ -2,6 +2,11 @@ import React, { Component } from 'react';
 import Board from './Components/Board';
 import ScoreBoard from './Components/ScoreBoard';
 import './App.css';
+import Navbar from 'react-bootstrap/lib/Navbar';
+
+
+
+
 
 class App extends Component {
   constructor(){
@@ -11,8 +16,7 @@ class App extends Component {
                 redScore: 0,
                 whiteScore: 0
               },
-      turn: "White",
-      newGame: false
+      turn: "White"
     }
   }
 
@@ -37,7 +41,8 @@ class App extends Component {
       scores: {
                 redScore: 0,
                 whiteScore: 0
-              }
+              },
+      turn: "White"
     });
   }
 
@@ -46,8 +51,20 @@ class App extends Component {
   }
 
   render() {
+    const navbar = (
+      <Navbar inverse>
+        <Navbar.Header>
+          <Navbar.Brand>
+            <a href="../../index.html">Classic Games Collection | Nick Snyder</a>
+          </Navbar.Brand>
+        </Navbar.Header>
+      </Navbar>
+    );
+
     return (
       <div className="App">
+        {navbar}
+        <h1 className="Title">Checkers</h1>
         <Board scores={this.handleScores.bind(this)} turn={this.changeTurn.bind(this)} onRef={ref => {this.child = ref;}} winner={this.win.bind(this)} />
         <ScoreBoard scores={this.state.scores} turn={this.state.turn} newGame={this.newGame} />
       </div>

@@ -1,5 +1,80 @@
+html, body, #app, #app>div{
+  height: 100%;
+  width: 100% !important;
+}
+
 .App {
   text-align: center;
+  width: 100%;
+}
+
+.newGameBtn{
+  background-color: #282828;
+  color: #ede8e8;
+}
+
+.newGameBtn:hover{
+  background-color: #282828;
+  color: #ede8e8;
+}
+
+.newGameBtn:active{
+  background-color: #282828;
+  color: #ede8e8;
+}
+
+.newGameBtn:focus{
+  background-color: #282828;
+  color: #ede8e8;
+}
+
+.navbar-brand{
+  color: #ede8e8 !important;
+}
+
+.Title{
+  display: flex;
+  font-size: 36px;
+  font-weight: bold;
+  color: #ce0a0a;
+  text-shadow: 2px 2px 1px #000 !important;
+  justify-content: center;
+}
+
+.Board{
+  height: auto;
+  width: 40vw;
+  margin: auto;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  border: 1px black solid;
+}
+
+.Square{
+  height: 5vw;
+  width: 5vw;
+  display: flex;
+}
+
+.Piece{
+  position: relative;
+  width: 90%;
+  margin: 5%;
+  border-radius: 200px;
+}
+
+.ScoreBoard{
+  position: fixed;
+  width: 20vw;
+  right: 20px;
+  top: 60px;
+  display: flex;
+  flex-direction: column;
+}
+
+.ScoreBoard table{
+  width: 100%;
 }
 
 .White{
@@ -14,33 +89,12 @@
   background-color: Red;
 }
 
-.Square{
-  height: 100px;
-  width: 100px;
-}
-
-.Board{
-  height: 800px;
-  width: 800px;
-  margin: auto;
-  display: grid;
-  grid-template-columns: repeat(8, 1fr);
-  border: 1px black solid;
-}
-
 .Highlighted{
   background-color: green;
 }
 
 .Jumpable{
   background-color: yellow;
-}
-
-.Piece{
-  height: 90px;
-  width: 90px;
-  margin: 5px;
-  border-radius: 200px;
 }
 
 .King{
